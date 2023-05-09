@@ -1,4 +1,9 @@
-function underlineText() {
+function createRegexFromArray(words) {
+    const regexString = '(' + words.join('|') + ')';
+    return new RegExp(regexString, 'gi');
+  }
+
+function underlineText(regex) {
     const treeWalker = document.createTreeWalker(
         document.body,
         NodeFilter.SHOW_TEXT,
@@ -29,9 +34,7 @@ function underlineText() {
         }
 
         const text = node.textContent;
-        const regex = /machine/gi;
-        // const wordsRegex = new RegExp("\\b(" + regex.source + ")\\b", "gi");
-
+        // const regex = /machine/gi;
         const wordsRegex = new RegExp("(" + regex.source + ")", "gi");
 
         let span = null;
@@ -96,10 +99,12 @@ function removeUnderlines() {
     }
   }
 
+const words_to_underline = ["machine", "refined"]
+const regex = createRegexFromArray(words_to_underline);
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.command === 'onReplace') {
-      underlineText();
+      underlineText(regex);
       console.log('Underlining enabled.');
       sendResponse({message: 'Underlining enabled.'});
     } else if (request.command === 'offReplace') {
