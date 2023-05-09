@@ -96,19 +96,6 @@ function removeUnderlines() {
     }
   }
 
-  
-// // remove underlines from the text
-// function removeUnderlines() {
-//     const underlineElements = document.getElementsByClassName("red-match");
-//     while (underlineElements.length) {
-//     const element = underlineElements[0];
-//     const parent = element.parentNode;
-//     const textNode = document.createTextNode(element.textContent.replace(/\n|\r/g, "").trim());
-//     parent.replaceChild(textNode, element);
-//     }
-// }
-
-        
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.command === 'onReplace') {
