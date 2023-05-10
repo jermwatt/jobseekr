@@ -1,18 +1,34 @@
 
+function createRegexFromArray(words) {
+    const regexString = '(' + words.join('|') + ')';
+    return new RegExp(regexString, 'gi');
+  }
+
 // function createRegexFromArray(words) {
-//     const regexString = '(' + words.join('|') + ')';
+//     const regexStrings = words.map(word => `(?:\\W|^)${word}(?:\\W|$)`);
+//     const regexString = '(' + regexStrings.join('|') + ')';
 //     return new RegExp(regexString, 'gi');
 //   }
-
-function createRegexFromArray(words) {
-    const regexStrings = words.map(word => `\\b${word}\\b|\\W${word}\\W`);
-    const regexString = '(' + regexStrings.join('|') + ')';
-    return new RegExp(regexString, 'gi');
-}
+  
+// function createRegexFromArray(words) {
+//     const regexString = "\\b(" + words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ")\\b";
+//     return new RegExp(regexString, 'gi');
+//   }
+  
+// function createRegexFromArray(words) {
+//     const regexString = `(\\b|\\W)(${words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})(\\b|\\W)`;
+//     return new RegExp(regexString, 'gi');
+//   }
+  
+// function createRegexFromArray(words) {
+//     const regexString = `(?:(?<=\\W)|^)(${words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})(?=(?:\\W|$))`;
+//     return new RegExp(regexString, 'gi');
+//   }
+  
   
 
 
-function underlineText(regex) {
+function underlineText(wordsRegex) {
     const treeWalker = document.createTreeWalker(
         document.body,
         NodeFilter.SHOW_TEXT,
@@ -43,13 +59,6 @@ function underlineText(regex) {
         }
 
         const text = node.textContent;
-        // const regex = /machine/gi;
-        // const wordsRegex = new RegExp("(" + regex.source + ")", "gi");
-        // const wordsRegex = new RegExp(`(${regex.source})`, "gi");
-        // const wordsRegex = new RegExp("(" + regex.source.replace(/^\^|\$$/g, "") + ")", "gi");
-
-        const wordsRegex = new RegExp(`\\b\\W*(${regex.source})\\W*\\b`, "gi");
-
         let span = null;
         let index = -1;
         while ((result = wordsRegex.exec(text)) !== null) {
@@ -61,10 +70,14 @@ function underlineText(regex) {
             const match = result[0];
             const matchIndex = result.index;
 
-            // check if match overlaps with previous match
-            if (matchIndex < index + match.length) {
-                continue;
-            }
+            // // check if match overlaps with previous match
+            // if (matchIndex < index + match.length) {
+            //     console.log('pre-match ' + match)
+            //     console.log("pre-matchIndex: " + matchIndex);
+            //     console.log("pre-index: " + (index + match.length));
+            //     console.log('match overlaps with previous match')
+            //     continue;
+            // }
 
             // add everything before the match as a text node
             if (matchIndex > index + 1) {
@@ -73,6 +86,7 @@ function underlineText(regex) {
                 );
                 span.appendChild(textNode);
             }
+            
 
             // wrap the match in a span
             const matchNode = document.createElement("span");
@@ -83,6 +97,7 @@ function underlineText(regex) {
             span.appendChild(matchNode);
 
             index = matchIndex + match.length - 1;
+
         }
 
         if (span !== null) {
@@ -112,7 +127,7 @@ function removeUnderlines() {
     }
   }
 
-  let words_to_underline = [];
+  let words_to_underline = ['test', 'name', 'jeremy', 'machine', 'learning', 'engineer', 'published', 'textbook', 'university', 'press']
   let regex = createRegexFromArray(words_to_underline);
   
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
