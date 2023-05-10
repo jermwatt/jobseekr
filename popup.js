@@ -1,3 +1,145 @@
+const stopWords = [
+  'a',
+  'able',
+  'about',
+  'across',
+  'after',
+  'all',
+  'almost',
+  'also',
+  'am',
+  'among',
+  'an',
+  'and',
+  'any',
+  'are',
+  'as',
+  'at',
+  'be',
+  'because',
+  'been',
+  'but',
+  'by',
+  'can',
+  'cannot',
+  'could',
+  'dear',
+  'did',
+  'do',
+  'does',
+  'either',
+  'else',
+  'ever',
+  'every',
+  'for',
+  'from',
+  'get',
+  'got',
+  'had',
+  'has',
+  'have',
+  'he',
+  'her',
+  'hers',
+  'him',
+  'his',
+  'how',
+  'however',
+  'i',
+  'if',
+  'in',
+  'into',
+  'is',
+  'it',
+  'its',
+  'just',
+  'least',
+  'let',
+  'like',
+  'likely',
+  'may',
+  'me',
+  'might',
+  'most',
+  'must',
+  'my',
+  'neither',
+  'no',
+  'nor',
+  'not',
+  'of',
+  'off',
+  'often',
+  'on',
+  'only',
+  'or',
+  'other',
+  'our',
+  'own',
+  'rather',
+  'said',
+  'say',
+  'says',
+  'she',
+  'should',
+  'since',
+  'so',
+  'some',
+  'than',
+  'that',
+  'the',
+  'their',
+  'them',
+  'then',
+  'there',
+  'these',
+  'they',
+  'this',
+  'tis',
+  'to',
+  'too',
+  'twas',
+  'us',
+  'wants',
+  'was',
+  'we',
+  'were',
+  'what',
+  'when',
+  'where',
+  'which',
+  'while',
+  'who',
+  'whom',
+  'why',
+  'will',
+  'with',
+  'would',
+  'yet',
+  'you',
+  'your'
+];
+
+function stripPunctuation(words) {
+  const regex = /[^\w\s]|_/g; // matches all punctuation characters
+  return words.map(word => word.replace(regex, ''));
+}
+
+function processFileContent(fileContent) {
+      // create an array of words from the file content
+      const words = fileContent.split(/\s+/);
+
+      // remove punctuation from words
+      const strippedWords = stripPunctuation(words);
+
+      // remove duplicate words
+      const uniqueWords = [...new Set(strippedWords)];
+
+      // filter out stop words
+      const filteredWords = uniqueWords.filter(word => !stopWords.includes(word));
+
+      return filteredWords;
+}
 
 document.addEventListener('DOMContentLoaded', function() {
   var toggleBtn = document.getElementById('toggle-btn');
@@ -29,6 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // event listener for storing user uploaded file
 document.addEventListener('DOMContentLoaded', () => {
+  
   // event listener for storing user uploaded file
   const fileInput = document.getElementById('fileInput');
 
@@ -51,11 +194,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     reader.onload = event => {
+      // file content is a string
       const fileContent = event.target.result;
-      const words = fileContent.split(/\s+/);
+
+      // filter out stop words
+      const filteredWords = processFileContent(fileContent);
 
       // Error handling
-      chrome.storage.local.set({ fileContent, words }, () => {
+      chrome.storage.local.set({ fileContent, filteredWords }, () => {
         if (chrome.runtime.lastError) {
           console.error('Error saving data to local storage:', chrome.runtime.lastError);
         } else {
@@ -71,34 +217,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // event listener for sending words to content script
   sendWordsButton.addEventListener('click', () => {
-    // retrieve the stored words from local storage
-    chrome.storage.local.get('words', ({ words }) => {
-      if (!words) {
-        console.error('Error retrieving words from local storage');
-        return;
-      }
-
+    // get the filtered words from local storage
+    chrome.storage.local.get('filteredWords', ({ filteredWords }) => {
+      // send a message to the content script to update the underline words
       chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, { words }, response => {
-          console.log(response);
+        chrome.tabs.sendMessage(tabs[0].id, { action: 'updateUnderlineWords', filteredWords }, response => {
+          console.log(response.message);
         });
       });
     });
   });
-
-
 });
 
-
-// // function to log the saved file content to the console
-// document.addEventListener('DOMContentLoaded', () => {
-//   const logContentButton = document.getElementById('logContentButton');
-//   logContentButton.addEventListener('click', () => {
-//     chrome.storage.local.get(['fileContent', 'words'], result => {
-//       const fileContent = result.fileContent;
-//       const words = result.words;
-//       console.log('File content:', fileContent);
-//       console.log('Words:', words);
-//     });    
-//   });
-// });

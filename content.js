@@ -1,9 +1,16 @@
-import { stopWords } from './stopwords.js';
+
+// function createRegexFromArray(words) {
+//     const regexString = '(' + words.join('|') + ')';
+//     return new RegExp(regexString, 'gi');
+//   }
 
 function createRegexFromArray(words) {
-    const regexString = '(' + words.join('|') + ')';
+    const regexStrings = words.map(word => `\\b${word}\\b|\\W${word}\\W`);
+    const regexString = '(' + regexStrings.join('|') + ')';
     return new RegExp(regexString, 'gi');
-  }
+}
+  
+
 
 function underlineText(regex) {
     const treeWalker = document.createTreeWalker(
@@ -37,7 +44,11 @@ function underlineText(regex) {
 
         const text = node.textContent;
         // const regex = /machine/gi;
-        const wordsRegex = new RegExp("(" + regex.source + ")", "gi");
+        // const wordsRegex = new RegExp("(" + regex.source + ")", "gi");
+        // const wordsRegex = new RegExp(`(${regex.source})`, "gi");
+        // const wordsRegex = new RegExp("(" + regex.source.replace(/^\^|\$$/g, "") + ")", "gi");
+
+        const wordsRegex = new RegExp(`\\b\\W*(${regex.source})\\W*\\b`, "gi");
 
         let span = null;
         let index = -1;
@@ -101,31 +112,32 @@ function removeUnderlines() {
     }
   }
 
-  const words_to_underline = [];
-  const filteredWords = words_to_underline.filter(word => !stopWords.includes(word.toLowerCase()));
-  let regex = createRegexFromArray(filteredWords);
+  let words_to_underline = [];
+  let regex = createRegexFromArray(words_to_underline);
   
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.command === 'onReplace') {
+    if (message.command === 'onReplace') 
+    {
       underlineText(regex);
       console.log('Underlining enabled.');
       sendResponse({message: 'Underlining enabled.'});
-    } else if (message.command === 'offReplace') {
+    } 
+    else if (message.command === 'offReplace') 
+    {
       removeUnderlines();
       console.log('Underlining disabled.')
       sendResponse({message: 'Underlining disabled.'});
-    } else if (message.action === 'updateUnderlineWords') {
+    } 
+    else if (message.action === 'updateUnderlineWords') 
+    {
       // update words_to_underline with the new words
-      const newWords = message.words;
+      const newWords = message.filteredWords;
       words_to_underline.splice(0, words_to_underline.length, ...newWords);
 
-      // update filteredWords and regex with the new words
-      const filteredNewWords = newWords.filter(word => !stopWords.includes(word.toLowerCase()));
-      filteredWords.splice(0, filteredWords.length, ...filteredNewWords);
-
       // update regex with the new words
-      regex = createRegexFromArray(filteredWords);
+      regex = createRegexFromArray(words_to_underline);
       console.log('Underline words updated:', words_to_underline);
+      console.log('Regex updated:', regex);
       sendResponse({message: 'Underline words updated.'});
     }
   });
