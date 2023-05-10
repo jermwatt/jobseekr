@@ -1,3 +1,5 @@
+import { stopWords } from './stopwords.js';
+
 function createRegexFromArray(words) {
     const regexString = '(' + words.join('|') + ')';
     return new RegExp(regexString, 'gi');
@@ -99,28 +101,32 @@ function removeUnderlines() {
     }
   }
 
-const words_to_underline = ["machine", "refined"]
-const regex = createRegexFromArray(words_to_underline);
-
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.command === 'onReplace') {
+  const words_to_underline = [];
+  const filteredWords = words_to_underline.filter(word => !stopWords.includes(word.toLowerCase()));
+  let regex = createRegexFromArray(filteredWords);
+  
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.command === 'onReplace') {
       underlineText(regex);
       console.log('Underlining enabled.');
       sendResponse({message: 'Underlining enabled.'});
-    } else if (request.command === 'offReplace') {
+    } else if (message.command === 'offReplace') {
       removeUnderlines();
       console.log('Underlining disabled.')
       sendResponse({message: 'Underlining disabled.'});
+    } else if (message.action === 'updateUnderlineWords') {
+      // update words_to_underline with the new words
+      const newWords = message.words;
+      words_to_underline.splice(0, words_to_underline.length, ...newWords);
+
+      // update filteredWords and regex with the new words
+      const filteredNewWords = newWords.filter(word => !stopWords.includes(word.toLowerCase()));
+      filteredWords.splice(0, filteredWords.length, ...filteredNewWords);
+
+      // update regex with the new words
+      regex = createRegexFromArray(filteredWords);
+      console.log('Underline words updated:', words_to_underline);
+      sendResponse({message: 'Underline words updated.'});
     }
   });
-
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.words) {
-        // do something with the words, e.g. display them on the page
-        console.log('Received words:', message.words);
-        sendResponse({ success: true });
-    } else {
-        sendResponse({ success: false, message: 'Words not found in message' });
-    }
-});
+  
