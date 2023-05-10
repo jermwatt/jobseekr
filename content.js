@@ -113,3 +113,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       sendResponse({message: 'Underlining disabled.'});
     }
   });
+
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.words) {
+        // do something with the words, e.g. display them on the page
+        console.log('Received words:', message.words);
+        sendResponse({ success: true });
+    } else {
+        sendResponse({ success: false, message: 'Words not found in message' });
+    }
+});
