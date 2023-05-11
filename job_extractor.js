@@ -67,23 +67,17 @@ if (window.location.href.includes("linkedin.com/jobs/view/")) {
   // On LinkedIn job collections pages
   if (window.location.href.includes("linkedin.com/jobs/collections/")) {
 
-        var jobDetailsElement = document.getElementById("job-details");
-        if (jobDetailsElement) {
-            console.log('-------- plugin output --------');
-            console.log('---- job COLLECTIONS page job description content ----');
-            var spanElements = jobDetailsElement.querySelectorAll("span");
-            var spanDictionary = {};
-            
-            Array.from(spanElements).forEach(span => {
-                var strongElement = span.querySelector("strong");
-                if (strongElement) {
-                var key = strongElement.textContent.trim();
-                var value = span.textContent.trim().substring(strongElement.textContent.length).trim();
-                spanDictionary[key] = value;
-                }
-            });
-            
-            console.log(spanDictionary);
-        }
+    var element = document.getElementById("job-details").querySelector("span");
+    if (element) {
+        console.log('-------- plugin output --------');
+        console.log('---- job COLLECTIONS page job description content ----');
+
+        console.log(element)
+        console.log(element.)
+
+        // var dictionary = extractViewElementDictionary(element);
+        // console.log(dictionary)
+        // }
         
     }
+}
