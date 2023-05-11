@@ -1,0 +1,30 @@
+# Linkedn job page divs 
+
+There are several ways of viewing jobs in linkedn - lets go by view 
+
+
+1.  https://www.linkedin.com/jobs/view/*
+
+
+search for
+
+var element = document.querySelector('article.jobs-description__container.jobs-description__container--condensed');
+console.log(element);
+
+
+
+2. https://www.linkedin.com/jobs/collections/*
+
+
+class="jobs-box--fadein jobs-box--full-width jobs-box--with-cta-large jobs-description
+
+     jobs-description--reformatted
+
+search for exact element
+
+var element = document.querySelector('.jobs-box--fadein.jobs-box--full-width.jobs-box--with-cta-large.jobs-description.jobs-description--reformatted');
+
+
+a fuzzy match 
+
+var elements = document.querySelectorAll('[class*="jobs-description--reformatted"]');
