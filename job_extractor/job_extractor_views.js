@@ -14,6 +14,14 @@ if (window.location.href.includes("linkedin.com/jobs/view/")) {
 
             console.log([...dictionary]);
 
+            // select keys for keyword pooling
+            // selectKeysForKeywordPooling(dictionary);
+
+            // pool and filter keywords
+            var filteredKeywords = poolKeywords(dictionary);
+
+            console.log(filteredKeywords)
+
         }
     }
 }

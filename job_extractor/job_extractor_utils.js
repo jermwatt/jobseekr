@@ -75,7 +75,7 @@ function createDictionary(arr) {
   let currentKey = null;
   for (let i = 0; i < arr.length; i++) {
     var entry = arr[i];
-    entry = entry.replace(/<(?!\/?strong\b)[^>]+>/g, '').trim();
+    entry = entry.replace(/<(?!\/?strong\b)[^>]+>/g, ' ').trim();
     if (entry.match(/^<strong>.*<\/strong>$/)) {
       // This entry matches the pattern <strong>*</strong>, so it's a key
       currentKey = entry.replace(/<[^>]+>/g, '').trim();
@@ -139,7 +139,9 @@ function finalAttempt(arr) {
 
   for (let i = 0; i < arr.length; i++) {
     const entry = arr[i];
-    const trimmedEntry = entry.replace(/<[^>]+>/g, '').trim();
+
+    // remove tags
+    const trimmedEntry = entry.replace(/<[^>]+>/g, ' ').trim();
 
     if (trimmedEntry.length < 50 && trimmedEntry.length > 0) {
       currentKey = trimmedEntry;
