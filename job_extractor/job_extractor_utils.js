@@ -109,7 +109,7 @@ function processArray(array) {
       continue;
     }
 
-    if (element.length < 20) {
+    if (element.length < 50  && trimmedEntry.length > 0) {
       const uppercaseFraction = getUppercaseFraction(element);
       if (uppercaseFraction >= 0.8) {
         currentKey = element;
@@ -121,12 +121,39 @@ function processArray(array) {
     if (currentKey !== null) {
       const currentValue = resultMap.get(currentKey);
       if (currentValue.length === 0) {
-        resultMap.set(currentKey, element);
+        const currentValue = resultMap.get(currentKey);
+        const modifiedValue = (currentValue + ' ' + trimmedEntry).trim();
+        resultMap.set(currentKey, modifiedValue);
+        // resultMap.set(currentKey, element);
       }
     }
   }
 
   return resultMap;
+}
+
+
+function finalAttempt(arr) {
+  const dict = new Map();
+  let currentKey = null;
+
+  for (let i = 0; i < arr.length; i++) {
+    const entry = arr[i];
+    const trimmedEntry = entry.replace(/<[^>]+>/g, '').trim();
+
+    if (trimmedEntry.length < 50 && trimmedEntry.length > 0) {
+      currentKey = trimmedEntry;
+      dict.set(currentKey, '');
+    } else {
+      if (currentKey !== null) {
+        const currentValue = dict.get(currentKey);
+        const modifiedValue = (currentValue + ' ' + trimmedEntry).trim();
+        dict.set(currentKey, modifiedValue);
+      }
+    }
+  }
+
+  return dict;
 }
 
 
@@ -185,6 +212,12 @@ function splitStringByPattern(str) {
   if (dictionary.size === 0){
     // try creating dictionary based on capital letter separators
     dictionary = processArray(new_split_str);
+  }
+
+  // final backup technique if <strong> tags are not used in description
+  if (dictionary.size <= 2){
+    // try creating dictionary based on capital letter separators
+    dictionary = finalAttempt(new_split_str);
   }
 
   // console.log(dictionary);
