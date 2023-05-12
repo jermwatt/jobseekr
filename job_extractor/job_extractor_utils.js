@@ -38,20 +38,21 @@ function removeEmojis(text) {
   return text.toString().replace(emojiRegex, '').trim();
 }
 
-// create final dictionary with <strong> element as key </strong>
 function createDictionary(arr) {
-  const dict = {};
+  const dict = new Map();
   let currentKey = null;
   for (let i = 0; i < arr.length; i++) {
     const entry = arr[i];
     if (entry.match(/^<strong>.*<\/strong>$/)) {
       // This entry matches the pattern <strong>*</strong>, so it's a key
       currentKey = entry.replace(/<[^>]+>/g, '').trim();
-      dict[currentKey] = '';
+      dict.set(currentKey, '');
     } else {
       // This entry is a value to be appended to the current key
       if (currentKey) {
-        dict[currentKey] += entry.replace(/<[^>]+>/g, ' ').trim();
+        const currentValue = dict.get(currentKey);
+        const modifiedValue = (currentValue + ' ' + entry.replace(/<[^>]+>/g, ' ').trim()).trim();
+        dict.set(currentKey, modifiedValue);
       }
     }
   }

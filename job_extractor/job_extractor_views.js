@@ -11,7 +11,9 @@ if (window.location.href.includes("linkedin.com/jobs/view/")) {
 
             // transform into dictionary
             var dictionary = splitStringByPattern(sectionTexts);
-            console.log(dictionary);
+
+            console.log([...dictionary]);
+
         }
     }
 }
