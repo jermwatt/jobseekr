@@ -1,3 +1,15 @@
+// compute fraction of uppercase characters in a string
+function getUppercaseFraction(inputString) {
+  const totalCharacters = inputString.length;
+  const uppercaseCharacters = inputString
+    .split('')
+    .filter(char => char === char.toUpperCase() && char !== char.toLowerCase())
+    .length;
+
+  const uppercaseFraction = uppercaseCharacters / totalCharacters;
+  return uppercaseFraction;
+}
+
 // unpack text from all children nodes
 function extractTextWithTagsFromElement(element) {
   if (!element) {
@@ -38,27 +50,6 @@ function removeEmojis(text) {
   return text.toString().replace(emojiRegex, '').trim();
 }
 
-function createDictionary(arr) {
-  const dict = new Map();
-  let currentKey = null;
-  for (let i = 0; i < arr.length; i++) {
-    const entry = arr[i];
-    if (entry.match(/^<strong>.*<\/strong>$/)) {
-      // This entry matches the pattern <strong>*</strong>, so it's a key
-      currentKey = entry.replace(/<[^>]+>/g, '').trim();
-      dict.set(currentKey, '');
-    } else {
-      // This entry is a value to be appended to the current key
-      if (currentKey) {
-        const currentValue = dict.get(currentKey);
-        const modifiedValue = (currentValue + ' ' + entry.replace(/<[^>]+>/g, ' ').trim()).trim();
-        dict.set(currentKey, modifiedValue);
-      }
-    }
-  }
-  return dict;
-}
-
 // split on characters and keep the left part
 function splitAndKeepLeftFirst(input, characters) {
   var regex = new RegExp('(.*?' + characters + ')');
@@ -79,6 +70,66 @@ function splitStringByStrongTags(input) {
   return [input];
 }
 
+function createDictionary(arr) {
+  const dict = new Map();
+  let currentKey = null;
+  for (let i = 0; i < arr.length; i++) {
+    var entry = arr[i];
+    entry = entry.replace(/<(?!\/?strong\b)[^>]+>/g, '').trim();
+    if (entry.match(/^<strong>.*<\/strong>$/)) {
+      // This entry matches the pattern <strong>*</strong>, so it's a key
+      currentKey = entry.replace(/<[^>]+>/g, '').trim();
+      dict.set(currentKey, '');
+    } else {
+      // This entry is a value to be appended to the current key
+      if (currentKey) {
+        const currentValue = dict.get(currentKey);
+        const modifiedValue = (currentValue + ' ' + entry.replace(/<[^>]+>/g, ' ').trim()).trim();
+        if (currentValue.length === 0) {
+          dict.set(currentKey, modifiedValue);
+          currentKey = null; // reset current key
+        }
+      }
+    }
+  }
+  return dict;
+}
+
+
+function processArray(array) {
+  const resultMap = new Map();
+  let currentKey = null;
+
+  for (let i = 0; i < array.length; i++) {
+    const element = array[i].replace(/<(?!\/?strong\b)[^>]+>/g, '').trim();
+
+    if (element.startsWith('<strong>') && element.endsWith('</strong>')) {
+      currentKey = element.substring(8, element.length - 9);
+      resultMap.set(currentKey, '');
+      continue;
+    }
+
+    if (element.length < 20) {
+      const uppercaseFraction = getUppercaseFraction(element);
+      if (uppercaseFraction >= 0.8) {
+        currentKey = element;
+        resultMap.set(currentKey, '');
+        continue;
+      }
+    }
+
+    if (currentKey !== null) {
+      const currentValue = resultMap.get(currentKey);
+      if (currentValue.length === 0) {
+        resultMap.set(currentKey, element);
+      }
+    }
+  }
+
+  return resultMap;
+}
+
+
 // main cleaner and splitter function 
 function splitStringByPattern(str) {
   // remove unnecessary characters
@@ -87,6 +138,8 @@ function splitStringByPattern(str) {
   // split up string based on paragrahs
   var regex = /<br>.*?<\/br>/g 
   var split_str = str.split(regex);
+  split_str = split_str.filter(element => !(element.trim() === ""));
+  split_str = split_str.filter(element => element.trim());
 
   // remove <p> tags </p>
   for (var i = 0; i < split_str.length; i++) {
@@ -127,6 +180,12 @@ function splitStringByPattern(str) {
 
   // cut into dictionary based on <strong>
   var dictionary =  createDictionary(new_split_str);
+
+  // backup technique if <strong> tags are not used in description
+  if (dictionary.size === 0){
+    // try creating dictionary based on capital letter separators
+    dictionary = processArray(new_split_str);
+  }
 
   // console.log(dictionary);
   return dictionary
