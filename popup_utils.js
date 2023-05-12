@@ -1,4 +1,4 @@
-const stopWords = [
+export const stopWords = [
     'a',
     'able',
     'about',
@@ -120,12 +120,12 @@ const stopWords = [
     'your'
   ];
   
-  function stripPunctuation(words) {
+export function stripPunctuation(words) {
     const regex = /[^\w\s]|_/g; // matches all punctuation characters
     return words.map(word => word.replace(regex, ''));
   }
   
-  function processFileContent(fileContent) {
+export function processFileContent(fileContent) {
         // create an array of words from the file content
         const words = fileContent.split(/\s+/);
   
