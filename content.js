@@ -4,30 +4,6 @@ function createRegexFromArray(words) {
     return new RegExp(regexString, 'gi');
   }
 
-// function createRegexFromArray(words) {
-//     const regexStrings = words.map(word => `(?:\\W|^)${word}(?:\\W|$)`);
-//     const regexString = '(' + regexStrings.join('|') + ')';
-//     return new RegExp(regexString, 'gi');
-//   }
-  
-// function createRegexFromArray(words) {
-//     const regexString = "\\b(" + words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ")\\b";
-//     return new RegExp(regexString, 'gi');
-//   }
-  
-// function createRegexFromArray(words) {
-//     const regexString = `(\\b|\\W)(${words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})(\\b|\\W)`;
-//     return new RegExp(regexString, 'gi');
-//   }
-  
-// function createRegexFromArray(words) {
-//     const regexString = `(?:(?<=\\W)|^)(${words.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})(?=(?:\\W|$))`;
-//     return new RegExp(regexString, 'gi');
-//   }
-  
-  
-
-
 function underlineText(wordsRegex) {
     const treeWalker = document.createTreeWalker(
         document.body,
