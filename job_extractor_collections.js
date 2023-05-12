@@ -5,61 +5,92 @@ function removeEmojis(text) {
   return text.toString().replace(emojiRegex, '').trim();
 }
 
-// extraction from collection version of job post
-function extractCollectionElementDictionary(element) {
-  if (!element || element.tagName.toLowerCase() !== 'span') {
-    console.error('Invalid element provided or element is not a <span>.');
+
+// // extraction from collection version of job post
+// function extractCollectionElementDictionary(element) {
+//   if (!element || element.tagName.toLowerCase() !== 'span') {
+//     console.error('Invalid element provided or element is not a <span>.');
+//     return null;
+//   }
+
+//   var innerHTML = element.innerHTML;
+//   var components = innerHTML.split('</strong><p>');
+
+//   // Remove empty strings and trim whitespace
+//   components = components.filter(component => component.trim() !== '');
+
+//   var dictionary = {};
+
+//   for (var i = 0; i < components.length; i++) {
+//     var component = components[i];
+//     var keyStartIndex = component.indexOf('<strong>') + 8;
+//     var keyEndIndex = component.indexOf('</strong>');
+//     if (keyStartIndex < 0 || keyEndIndex < 0) {
+//       console.warn('Invalid component format:', component);
+//       continue;
+//     }
+//     var key = component.substring(keyStartIndex - 9, keyEndIndex).replace(/<[^>]+>/g, '').trim();
+
+//     var value = component.substring(keyEndIndex + 9).trim();
+
+//     if (key.length > 0) {
+//       key = key.replace(/<[^>]+>/g, '  ');
+
+//       if (value.includes('<ul>')) {
+//         var ulStartIndex = value.indexOf('<ul>');
+//         var ulEndIndex = value.indexOf('</ul>');
+//         if (ulStartIndex < 0 || ulEndIndex < 0) {
+//           console.warn('Invalid component format:', component);
+//           continue;
+//         }
+//         var ulContent = value.substring(ulStartIndex, ulEndIndex + 5);
+//         var liTags = ulContent.split('<li>');
+//         var sentences = liTags.map(tag => tag.replace(/<[^>]+>/g, '').trim()).filter(sentence => sentence !== '');
+//         value = sentences;
+//       } else {
+//         value = value.replace(/<[^>]+>/g, '').trim();
+//       }
+
+//       // Remove emojis from key and value
+//       key = removeEmojis(key);
+//       value = removeEmojis(value);
+
+//       dictionary[key] = value;
+//     }
+//   }
+
+//   return dictionary;
+// }
+
+function extractTextWithTagsFromElement(element) {
+  if (!element) {
+    console.error('Invalid element provided.');
     return null;
   }
 
-  var innerHTML = element.innerHTML;
-  var components = innerHTML.split('<strong>');
+  var textWithTags = '';
 
-  // Remove empty strings and trim whitespace
-  components = components.filter(component => component.trim() !== '');
-
-  var dictionary = {};
-
-  for (var i = 0; i < components.length; i++) {
-    var component = components[i];
-    var keyStartIndex = component.indexOf('<strong>') + 8;
-    var keyEndIndex = component.indexOf('</strong>');
-    if (keyStartIndex < 0 || keyEndIndex < 0) {
-      console.warn('Invalid component format:', component);
-      continue;
-    }
-    var key = component.substring(keyStartIndex - 9, keyEndIndex).replace(/<[^>]+>/g, '').trim();
-
-    var value = component.substring(keyEndIndex + 9).trim();
-
-    if (key.length > 0) {
-      key = key.replace(/<[^>]+>/g, '  ');
-
-      if (value.includes('<ul>')) {
-        var ulStartIndex = value.indexOf('<ul>');
-        var ulEndIndex = value.indexOf('</ul>');
-        if (ulStartIndex < 0 || ulEndIndex < 0) {
-          console.warn('Invalid component format:', component);
-          continue;
-        }
-        var ulContent = value.substring(ulStartIndex, ulEndIndex + 5);
-        var liTags = ulContent.split('<li>');
-        var sentences = liTags.map(tag => tag.replace(/<[^>]+>/g, '').trim()).filter(sentence => sentence !== '');
-        value = sentences;
-      } else {
-        value = value.replace(/<[^>]+>/g, '').trim();
+  function traverseNodes(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      textWithTags += node.textContent.replace(/\n/g, ' ');
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      textWithTags += node.outerHTML;
+      var childNodes = node.childNodes;
+      for (var i = 0; i < childNodes.length; i++) {
+        traverseNodes(childNodes[i]);
       }
-
-      // Remove emojis from key and value
-      key = removeEmojis(key);
-      value = removeEmojis(value);
-
-      dictionary[key] = value;
+      textWithTags += '</' + node.tagName.toLowerCase() + '>';
     }
   }
 
-  return dictionary;
+  traverseNodes(element);
+
+  return removeEmojis(textWithTags).replace(/\n/g, '').replace('<span>','').replace('</span>','').trim();
 }
+
+
+
+
 
 
 // extract job data from collections version of LinkedIn job post
@@ -69,8 +100,20 @@ if (window.location.href.includes("linkedin.com/jobs/collections/")) {
     if (jobDetailsElement) {
       var element = jobDetailsElement.querySelector("span");
       if (element) {
-        var dictionary = extractCollectionElementDictionary(element);
-        console.log(dictionary);
+        // var dictionary = extractCollectionElementDictionary(element);
+        // console.log(dictionary);
+
+        // Assuming `element` is the root element of your DOM structure
+        var sectionTexts = extractTextWithTagsFromElement(element);
+        console.log(sectionTexts);
+
+        // // Print the extracted section titles and text of interest
+        // sectionTexts.forEach(function(section) {
+        //   console.log('Section Title:', section.sectionTitle);
+        //   console.log('Text of Interest:', section.textOfInterest);
+        // });
+
+
       }
     }
   }
