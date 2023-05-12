@@ -1,138 +1,130 @@
+function createRegexFromArray(words) {
+    const escapedWords = words.map(word => word.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
+    const regexString = '\\b(' + escapedWords.join('|') + ')\\b';
+    return new RegExp(regexString, 'gi');
+}
 
-// unpack text from all children nodes
-function extractTextWithTagsFromElement(element) {
-  if (!element) {
-    console.error('Invalid element provided.');
-    return null;
-  }
+function underlineText(wordsRegex, targetElement) {
+    if (!targetElement) {
+        console.error('Target element not found.');
+        return;
+    }
 
-  var textWithTags = '';
+    const treeWalker = document.createTreeWalker(
+        targetElement,
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+    );
+    
+    // list of nodes to be replaced
+    const nodesToReplace = [];
+    let node;
+    while ((node = treeWalker.nextNode())) {
+        // ignore text inside script and style tags
+        if (
+            node.parentNode.tagName === "SCRIPT" ||
+            node.parentNode.tagName === "STYLE"
+        ) {
+            continue;
+        }
 
+        // ignore text inside image tags
+        if (node.parentNode.tagName === "IMG") {
+            continue;
+        }
 
-  function traverseNodes(node) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      textWithTags += node.textContent.replace(/\n/g, ' ');
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
-      textWithTags += '<' + node.tagName.toLowerCase() + '>';
-      var childNodes = node.childNodes;
-      for (var i = 0; i < childNodes.length; i++) {
-        traverseNodes(childNodes[i]);
-      }
-      textWithTags += '</' + node.tagName.toLowerCase() + '>';
+        // ignore text inside div tags that are not paragraphs
+        if (node.parentNode.tagName === "DIV" && node.parentNode.tagName !== "P") {
+            continue;
+        }
+
+        const text = node.textContent;
+        let span = null;
+        let index = -1;
+        while ((result = wordsRegex.exec(text)) !== null) {
+            if (span === null) {
+                span = document.createElement("span");
+                span.className='zoid-match-parent'
+            }
+
+            const match = result[0];
+            const matchIndex = result.index;
+
+            // add everything before the match as a text node
+            if (matchIndex > index + 1) {
+                const textNode = document.createTextNode(
+                    text.substring(index + 1, matchIndex)
+                );
+                span.appendChild(textNode);
+            }
+            
+            // wrap the match in a span
+            const matchNode = document.createElement("span");
+            matchNode.className = "zoid-match"; // add class name to the new span element
+            matchNode.style.textDecoration = "underline";
+            matchNode.style.color = "red"; // make the underline color red
+
+            matchNode.appendChild(document.createTextNode(match));
+            span.appendChild(matchNode);
+
+            index = matchIndex + match.length - 1;
+
+        }
+
+        if (span !== null) {
+            // add everything after the last match as a text node
+            if (index < text.length - 1) {
+                const textNode = document.createTextNode(text.substring(index + 1));
+                span.appendChild(textNode);
+            }
+
+            // add the node to the list of nodes to be replaced
+            nodesToReplace.push({ node, span });
+        }
+    }
+
+    // replace all the nodes outside of the loop
+    nodesToReplace.forEach(({ node, span }) => {
+        node.parentNode.replaceChild(span, node);
+    });
+}
+             
+function removeUnderlines() {
+    const parentElements = document.getElementsByClassName("zoid-match-parent");
+    while (parentElements.length) {
+      const parent = parentElements[0];
+      const textNode = document.createTextNode(parent.textContent.replace(/\n|\r/g, "").trim());
+      parent.parentNode.replaceChild(textNode, parent);
     }
   }
 
-  traverseNodes(element);
+// main switch for underlining / removing underlines
+function underlineSwitch(message, targetElement, sendResponse) {
+    if (message.command === 'onReplace') 
+    {   
+        console.log('onReplace triggered')
+        underlineText(regex, targetElement);
+        console.log('Underlining enabled.');
+        sendResponse({message: 'Underlining enabled.'});
+    } 
+    else if (message.command === 'offReplace') 
+    {   
+        console.log('offReplace triggered')
+        removeUnderlines();
+        console.log('Underlining disabled.')
+        sendResponse({message: 'Underlining disabled.'});
+    } 
+    else if (message.action === 'updateUnderlineWords') 
+    {
+        // update words_to_underline with the new words
+        const newWords = message.filteredWords;
+        words_to_underline.splice(0, words_to_underline.length, ...newWords);
 
-  return textWithTags.replace(/\n/g, '').replace('<span>','').replace('</span>','').trim();
-}
-
-
-// remove quotes
-function removeQuotes(str) {
-  return str.replace(/['"]/g, '');
-}  
-
-// remove emojis from text
-function removeEmojis(text) {
-  var emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\u261D|\uD83D[\uDC4D\uDC4E\uDC4C\uDC4F\uDC46\uDC47\uDC49-\uDC4B\uDC4A\uDC48]|[\u270A-\u270D]|[\uDC00-\uDFFF]|[\uD83C][\uDC00-\uDFFF]|[\uD83D][\uDC00-\uDFFF]|[\uD83E][\uDC00-\uDFFF]|[\u2600-\u27BF]/g;
-
-  // Remove emojis from text (after converting to string)
-  return text.toString().replace(emojiRegex, '').trim();
-}
-
-// create final dictionary with <strong> element as key </strong>
-function createDictionary(arr) {
-  const dict = {};
-  let currentKey = null;
-  for (let i = 0; i < arr.length; i++) {
-    const entry = arr[i];
-    if (entry.match(/^<strong>.*<\/strong>$/)) {
-      // This entry matches the pattern <strong>*</strong>, so it's a key
-      currentKey = entry.replace(/<[^>]+>/g, '').trim();
-      dict[currentKey] = '';
-    } else {
-      // This entry is a value to be appended to the current key
-      if (currentKey) {
-        dict[currentKey] += entry.replace(/<[^>]+>/g, ' ').trim();
-      }
+        // update regex with the new words
+        regex = createRegexFromArray(words_to_underline);
+        console.log('Underline words updated:', words_to_underline);
+        console.log('Regex updated:', regex);
+        sendResponse({message: 'Underline words updated.'});
     }
-  }
-  return dict;
 }
-
-
-// split on characters and keep the left part
-function splitAndKeepLeftFirst(input, characters) {
-  var regex = new RegExp('(.*?' + characters + ')');
-  var match = input.match(regex);
-  if (match) {
-    var left = match[1];
-    var right = input.slice(left.length);
-    return [left, right];
-  }
-  return [input];
-}
-
-// wrapper for splitting string on <strong> tags
-function splitStringByStrongTags(input) {
-  if (input.startsWith('<strong>') && !input.endsWith('</strong>')) {
-      return splitAndKeepLeftFirst(input, '</strong>');
-  }
-  return [input];
-}
-
-// main cleaner and splitter function 
-function splitStringByPattern(str) {
-  // remove unnecessary characters
-  str = removeQuotes(removeEmojis(str))
-
-  // split up string based on paragrahs
-  var regex = /<br>.*?<\/br>/g 
-  var split_str = str.split(regex);
-
-  // remove <p> tags </p>
-  for (var i = 0; i < split_str.length; i++) {
-      split_str[i] = split_str[i].replace(/<p>/g, '').trim();
-      split_str[i] = split_str[i].replace(/<\/p>/g, '').trim();
-  }
-
-  // remove empty strings
-  split_str = split_str.filter(function (el) {
-      return el != "";
-  });
-
-  // if </strong> is seen first, move </strong> to previous element
-  for (var i = 1; i < split_str.length; i++) {
-      if (split_str[i].startsWith('</strong>')) {
-        // add </strong> to previous element
-        split_str[i-1] = split_str[i-1] + '</strong>';
-
-        // remove first instance of </strong> from current element
-        split_str[i] = split_str[i].replace('</strong>', function(match) {
-          return '';
-        });
-      }
-    }
-
-  // check each element of split_str for <strong> tags with splitStringByStrongTags
-  var new_split_str = [];
-  for (var i = 0; i < split_str.length; i++) {
-      split = splitStringByStrongTags(split_str[i]);
-      if (split.length > 1) {
-          new_split_str.push(split[0]);
-          new_split_str.push(split[1]);
-      }
-      else {
-          new_split_str.push(split[0]);
-      }
-  }
-
-  // cut into dictionary based on <strong>
-  var dictionary =  createDictionary(new_split_str);
-
-  // console.log(dictionary);
-  return dictionary
-}
-
-
