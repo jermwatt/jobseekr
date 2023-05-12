@@ -1,3 +1,11 @@
+function removeEmojis(text) {
+    var emojiRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]|\u261D|\uD83D[\uDC4D\uDC4E\uDC4C\uDC4F\uDC46\uDC47\uDC49-\uDC4B\uDC4A\uDC48]|[\u270A-\u270D]|[\uDC00-\uDFFF]|[\uD83C][\uDC00-\uDFFF]|[\uD83D][\uDC00-\uDFFF]|[\uD83E][\uDC00-\uDFFF]|[\u2600-\u27BF]/g;
+  
+    // Remove emojis from text (after converting to string)
+    return text.toString().replace(emojiRegex, '').trim();
+  }
+
+// extraction from view version of job post
 function extractViewElementDictionary(element) {
     if (!element) {
       console.error('Invalid element provided.');
@@ -21,8 +29,6 @@ function extractViewElementDictionary(element) {
         continue;
       }
       var key = component.substring(keyStartIndex-9, keyEndIndex).replace(/<[^>]+>/g, '').trim();
-      console.log(key)
-
       var value = component.substring(keyEndIndex + 9).trim();
   
       if (key.length > 0) {
@@ -43,6 +49,10 @@ function extractViewElementDictionary(element) {
           value = value.replace(/<[^>]+>/g, '').trim();
         }
   
+        // Remove emojis from key and value
+        key = removeEmojis(key);
+        value = removeEmojis(value);
+        
         dictionary[key] = value;
       }
     }
@@ -50,71 +60,16 @@ function extractViewElementDictionary(element) {
     return dictionary;
 }
 
-
-
-function test(element) {
-    if (!element || element.tagName.toLowerCase() !== 'span') {
-      console.error('Invalid element provided or element is not a <span>.');
-      return null;
-    }
-  
-    var elements = Array.from(element.querySelectorAll('*'));
-    console.log(elements)
-  
-    var extractedValues = [];
-  
-    elements.forEach(el => {
-      var value = el.textContent.trim();
-      if (value.length > 0) {
-        extractedValues.push(value);
-      }
-    });
-  
-    return extractedValues;
-  }
-  
-  
-  
-  
-  
-  
-
-// On LinkedIn job view pages
+// extract job data from views version of linekdin job post
 if (window.location.href.includes("linkedin.com/jobs/view/")) {
     window.onload = function() {
     var element = document.querySelector('article.jobs-description__container.jobs-description__container--condensed');
     if (element) {
-      console.log('-------- plugin output --------');
-      console.log('---- job VIEW page job description content ----');
-      var dictionary = extractViewElementDictionary(element);
-      console.log(dictionary);
+    var dictionary = extractViewElementDictionary(element);
+    console.log(dictionary);
     }
-  }
 }
-  
+}
 
-  
-  // On LinkedIn job collections pages
-  if (window.location.href.includes("linkedin.com/jobs/collections/")) {
-    window.onload = function()  {
-        var jobDetailsElement = document.getElementById("job-details");
-        console.log(jobDetailsElement)
-        if (jobDetailsElement) {
-        var spanElement = jobDetailsElement.querySelector("span");
-        console.log(spanElement)
-        if (spanElement) {
-            var pElements = spanElement.querySelectorAll("p");
-            var strongElements = spanElement.querySelectorAll("strong");
-            
-            console.log("Paragraphs:");
-            console.log(pElements);
-            
-            console.log("Strong elements:");
-            console.log(strongElements);
 
-            console.log('test')
-            console.log(test(spanElement))
-            }
-        }
-    }
-  }
+ 

@@ -26,10 +26,16 @@
       },
       {
         "matches": [
-          "https://www.linkedin.com/jobs/view/*",
+          "https://www.linkedin.com/jobs/view/*"
+        ],
+        "js": ["job_extractor_views.js"],
+        "run_at": "document_end"
+      },
+      {
+        "matches": [
           "https://www.linkedin.com/jobs/collections/*"
         ],
-        "js": ["job_extractor.js"],
+        "js": ["job_extractor_collections.js"],
         "run_at": "document_end"
       }
     ],
