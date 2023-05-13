@@ -12,8 +12,6 @@ if (window.location.href.includes("linkedin.com/jobs/view/")) {
             // transform into dictionary
             var dictionary = splitStringByPattern(sectionTexts);
 
-            console.log([...dictionary]);
-
             // select keys for keyword pooling
             // selectKeysForKeywordPooling(dictionary);
 
