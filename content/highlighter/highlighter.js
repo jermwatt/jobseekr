@@ -1,8 +1,5 @@
 
-
-let words_to_underline = ['test', 'name', 'jeremy', 'machine', 'learning', 'engineer', 'published', 'textbook', 'university', 'press']
-let regex = createRegexFromArray(words_to_underline);
-
+// function to underline or remove underlines from job post
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // main switch for underlining / removing underlines
     if (window.location.href.includes("linkedin.com/jobs/collections/")) {

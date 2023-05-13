@@ -1,4 +1,4 @@
-function poolKeywords(dict) {
+function cleanupDict(dict) {
     const processedDict = new Map();
   
     dict.forEach((value, key) => {
@@ -14,4 +14,18 @@ function poolKeywords(dict) {
     return processedDict;
   }
   
+function combineValueArrays(map) {
+    const combinedArray = [];
+  
+    const keys = Array.from(map.keys());
+    const numKeys = keys.length;
+  
+    for (let i = 0; i < numKeys - 1; i++) {
+      const key = keys[i];
+      const valueArray = map.get(key);
+      combinedArray.push(...valueArray);
+    }
+  
+    return combinedArray;
+  }
   

@@ -15,14 +15,25 @@ if (window.location.href.includes("linkedin.com/jobs/view/")) {
             // select keys for keyword pooling
             // selectKeysForKeywordPooling(dictionary);
 
-            // pool and filter keywords
-            var filteredKeywords = poolKeywords(dictionary);
+            // cleanup dictionary
+            dictionary = cleanupDict(dictionary);
 
-            console.log(filteredKeywords)
+            // pool keywords
+            let pageWords = combineValueArrays(dictionary);
 
+            // save pageWords to local storage
+            chrome.storage.local.set({ pageWords }, () => {
+                if (chrome.runtime.lastError) {
+                    console.error('Error saving data to local storage:', chrome.runtime.lastError);
+                } else {
+                    console.log(pageWords)
+
+                    console.log('pageWords saved to local storage.');
+                }
+               });
+            }
         }
     }
-}
 }
 
 

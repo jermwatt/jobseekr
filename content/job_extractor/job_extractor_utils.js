@@ -225,3 +225,26 @@ function splitStringByPattern(str) {
   // console.log(dictionary);
   return dictionary
 }
+
+
+
+function storePageWords(pageWords) {
+  // set the fileWords in local storage
+  chrome.storage.local.set({ pageWords }, () => {
+    if (chrome.runtime.lastError) {
+      console.error('Error saving data to local storage:', chrome.runtime.lastError);
+    } else {
+      console.log('Page content and words saved to local storage.');
+    }
+  });
+
+  // send a message to the content script to update the underline words
+  chrome.storage.local.get('pageWords', ({ pageWords }) => {
+    // send a message to the content script to update the underline words
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+      chrome.tabs.sendMessage(tabs[0].id, { action: 'updatePageWords', pageWords }, response => {
+        console.log(response.message);
+      });
+    });
+  });
+}

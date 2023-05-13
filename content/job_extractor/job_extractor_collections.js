@@ -15,9 +15,22 @@ if (window.location.href.includes("linkedin.com/jobs/collections/")) {
             // select keys for keyword pooling
             // selectKeysForKeywordPooling(dictionary);
 
-            // pool and filter keywords
-            var filteredKeywords = poolKeywords(dictionary);
-            console.log(filteredKeywords)
+            // cleanup dictionary
+            dictionary = cleanupDict(dictionary);
+
+            // pool keywords
+            let pageWords = combineValueArrays(dictionary);
+
+            // save pageWords to local storage
+            chrome.storage.local.set({ pageWords }, () => {
+              if (chrome.runtime.lastError) {
+                  console.error('Error saving data to local storage:', chrome.runtime.lastError);
+              } else {
+                  console.log('pageWords saved to local storage.');
+              }
+             });
+
+            console.log(pageWords)
 
       }
     }

@@ -117,16 +117,32 @@ function underlineSwitch(message, targetElement, sendResponse) {
     } 
     else if (message.action === 'updateUnderlineWords') 
     {
+        //// retrieve fileWords ////
         // receive words from message
-        let newWords = message.fileWords;
+        let fileWords = message.fileWords;
 
         // filter words
-        newWords = newWords
+        fileWords = fileWords
         .filter((word) => word !== '') // Remove empty strings
         .filter((word) => !stopWords.includes(word)); // Filter out stop words
 
+        console.log('fileWords:', fileWords)
+
+        //// load pageWords from storage ////
+        chrome.storage.local.get('pageWords', function(result) {
+            const storedPageWords = result.pageWords;
+          
+            if (Array.isArray(storedPageWords)) {
+              console.log(storedPageWords);
+            } else {
+              console.log('No pageWords array found in local storage');
+            }
+          });
+          
+
+
         // update words_to_underline with the new words
-        words_to_underline.splice(0, words_to_underline.length, ...newWords);
+        words_to_underline.splice(0, words_to_underline.length, ...fileWords);
 
         // update regex with the new words
         regex = createRegexFromArray(words_to_underline);

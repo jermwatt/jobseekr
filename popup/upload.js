@@ -2,12 +2,12 @@
 function storeFile(fileWords) {
     // set the fileWords in local storage
     chrome.storage.local.set({ fileWords }, () => {
-    if (chrome.runtime.lastError) {
-      console.error('Error saving data to local storage:', chrome.runtime.lastError);
-    } else {
-      console.log('File content and words saved to local storage.');
-    }
-  });
+      if (chrome.runtime.lastError) {
+        console.error('Error saving data to local storage:', chrome.runtime.lastError);
+      } else {
+        console.log('File content and words saved to local storage.');
+      }
+    });
 
   // send a message to the content script to update the underline words
   chrome.storage.local.get('fileWords', ({ fileWords }) => {
