@@ -23,15 +23,12 @@ if (window.location.href.includes("linkedin.com/jobs/collections/")) {
 
             // save pageWords to local storage
             chrome.storage.local.set({ pageWords }, () => {
-              if (chrome.runtime.lastError) {
-                  console.error('Error saving data to local storage:', chrome.runtime.lastError);
-              } else {
-                  console.log('pageWords saved to local storage.');
-              }
-             });
-
-            console.log(pageWords)
-
+                if (chrome.runtime.lastError) {
+                    console.error('Error saving data to local storage:', chrome.runtime.lastError);
+                } else {
+                    console.log('pageWords saved to local storage.');
+                }
+            });
       }
     }
   }
