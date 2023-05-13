@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         var targetElement = document.querySelector('article.jobs-description__container.jobs-description__container--condensed');
         if (targetElement) {
             underlineSwitch(message, targetElement, sendResponse);
-            }
+        }
     }
 });
   

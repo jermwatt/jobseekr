@@ -118,7 +118,8 @@ function underlineSwitch(message, targetElement, sendResponse) {
     else if (message.action === 'updateUnderlineWords') 
     {
         // update words_to_underline with the new words
-        const newWords = message.filteredWords;
+        const newWords = message.fileWords;
+        console.log(newWords)
         words_to_underline.splice(0, words_to_underline.length, ...newWords);
 
         // update regex with the new words
