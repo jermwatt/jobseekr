@@ -1,33 +1,17 @@
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+# JobSeekr: Custom Resumes and Cover Letters Generator
 
-## Getting Started
+This repo contains a wip chrome extension for better job-targeted resume writing.  It is inspired by the [jobalytics extension](https://chrome.google.com/webstore/detail/jobalytics-resume-keyword/fkiljfkkceaopbpfgfmjdnkiejaifkgd).
 
-First, run the development server:
+JobSeekr is a powerful Chrome extension designed to assist job seekers in creating tailored resumes and cover letters that match the crucial keywords in job descriptions. With JobSeekr, you not only get automated generation, but also helpful feedback and suggestions on crucial keywords to add to your resumes.
 
-```bash
-pnpm dev
-# or
-npm run dev
-```
+Integrating seamlessly with Google Docs, JobSeekr analyzes job descriptions and provides real-time insights and suggestions on the most important keywords and phrases to include in your application materials. This ensures that your resumes and cover letters are optimized for each specific job opportunity.
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
+## Key Features:
 
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
+- Seamless Integration: JobSeekr seamlessly integrates with Google Docs, offering a convenient and familiar environment for creating and editing your application materials.
+- Keyword Analysis and Suggestions: The extension analyzes job descriptions, providing valuable feedback and suggestions on crucial keywords to enhance the content of your resumes and cover letters.
+- Time-Saving Versioning: JobSeekr enables you to quickly version your resumes and cover letters for different job descriptions, saving you time and effort in tailoring your application materials.
+- Fast Insights for Human Review: JobSeekr streamlines the process of reviewing and optimizing your resumes and cover letters. Its fast insights help you fine-tune your application materials efficiently.
+- Convenience: JobSeekr provides a user-friendly interface and tools that make the process of creating customized resumes and cover letters convenient and hassle-free.
 
-For further guidance, [visit our Documentation](https://docs.plasmo.com/)
-
-## Making production build
-
-Run the following:
-
-```bash
-pnpm build
-# or
-npm run build
-```
-
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
-
-## Submit to the webstores
-
-The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
+Don't let your job applications go unnoticed. Elevate your chances of success with JobSeekr, the Chrome extension that empowers you to create compelling, keyword-optimized resumes and cover letters. Save time, gain valuable insights, and improve your employability with JobSeekr.
