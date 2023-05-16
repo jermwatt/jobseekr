@@ -1,24 +1,39 @@
 
 function storeFile(fileWords) {
-    // set the fileWords in local storage
-    chrome.storage.local.set({ fileWords }, () => {
-      if (chrome.runtime.lastError) {
-        console.error('Error saving data to local storage:', chrome.runtime.lastError);
-      } else {
-        console.log('File content and words saved to local storage.');
-      }
-    });
+  // Set the fileWords in local storage
+  chrome.storage.local.set({ fileWords }, () => {
+    if (chrome.runtime.lastError) {
+      console.error('Error saving data to local storage:', chrome.runtime.lastError);
+    } else {
+      console.log('File content and words saved to local storage.');
 
-  // send a message to the content script to update the underline words
-  chrome.storage.local.get('fileWords', ({ fileWords }) => {
-    // send a message to the content script to update the underline words
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-      chrome.tabs.sendMessage(tabs[0].id, { action: 'updateUnderlineWords', fileWords }, response => {
-        console.log(response.message);
+      // chrome.runtime.sendMessage({ action: 'updateUnderlineWords', fileWords }, response => {
+      //   setTimeout(() => {
+      //   if (chrome.runtime.lastError) {
+      //     console.error('Error sending message:', chrome.runtime.lastError);
+      //   } else {
+      //     console.log('Message sent successfully');
+      //     // Handle the response received from the content script
+      //     console.log(response);
+      //   }
+      // }, 2000);
+      // });
+      
+      // Send a message to the content script to update the underline words
+      chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+        chrome.tabs.sendMessage(tabs[0].id, { action: 'updateUnderlineWords', fileWords }, response => {
+          if (chrome.runtime.lastError) {
+            console.error('Error sending message to content script:', chrome.runtime.lastError);
+          } else if (response && response.message) {
+            console.log(response.message);
+          }
+        });
       });
-    });
+    }
   });
 }
+
+
 
 function getUniqueWords(text) {
   function cleanText(text) {

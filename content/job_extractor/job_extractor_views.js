@@ -2,6 +2,8 @@
 // extract job data from views version of linekdin job post
 if (window.location.href.includes("linkedin.com/jobs/view/")) {
     window.onload = function() {
+    setTimeout(function() {
+
     var jobDetailsElement = document.querySelector('article.jobs-description__container.jobs-description__container--condensed');
     if (jobDetailsElement) {
         var element = jobDetailsElement.querySelector("span");
@@ -31,8 +33,8 @@ if (window.location.href.includes("linkedin.com/jobs/view/")) {
                });
             }
         }
+    }, 2000); 
     }
 }
-
 
  

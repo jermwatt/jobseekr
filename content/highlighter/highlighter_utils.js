@@ -210,57 +210,84 @@ let redRegex = createRegexFromArray(red_words_to_underline);
 let green_words_to_underline = []
 let greenRegex = createRegexFromArray(green_words_to_underline);
 
-function underlineSwitch(message, targetElement, sendResponse) {
-    if (message.command === 'onReplace') 
-    {   
-        console.log('onReplace triggered')
-        underlineRedText(redRegex, targetElement);
-        underlineGreenText(greenRegex, targetElement);
-        console.log('Underlining enabled.');
-        sendResponse({message: 'Underlining enabled.'});
-    } 
-    else if (message.command === 'offReplace') 
-    {   
-        console.log('offReplace triggered')
-        removeUnderlines();
-        console.log('Underlining disabled.')
-        sendResponse({message: 'Underlining disabled.'});
-    } 
-    else if (message.action === 'updateUnderlineWords') 
-    {
-        //// retrieve fileWords ////
-        // receive words from message
-        let fileWords = message.fileWords;
 
-        // filter words
-        fileWords = fileWords
-        .filter((word) => word !== '') // Remove empty strings
-        .filter((word) => !stopWords.includes(word)); // Filter out stop words
+// chrome.runtime.onMessage.addListener(
+    function underlineSwitch(message, sender, sendResponse) {
+        if (message.command === 'onReplace') 
+        {   
+            console.log('onReplace triggered')
+            underlineRedText(redRegex, sender);
+            underlineGreenText(greenRegex, sender);
+            console.log('Underlining enabled.');
+            sendResponse({message: 'Underlining enabled.'});
+        } 
+        else if (message.command === 'offReplace') 
+        {   
+            console.log('offReplace triggered')
+            removeUnderlines();
+            console.log('Underlining disabled.')
+            sendResponse({message: 'Underlining disabled.'});
+        } 
+        else if (message.action === 'updateUnderlineWords') 
+        {
+            //// retrieve fileWords ////
+            // receive words from message
+            let fileWords = message.fileWords;
+            console.log('a')
+            // console.log('fileWords:', fileWords)
 
-        // console.log('fileWords:', fileWords)
+            // filter words
+            fileWords = fileWords
+            .filter((word) => word !== '') // Remove empty strings
+            .filter((word) => !stopWords.includes(word)); // Filter out stop words
+            console.log('b')
 
-        //// load pageWords from storage ////
-        let pageWords = [];
-        chrome.storage.local.get('pageWords', function(result) {
-            pageWords = result.pageWords;
-          
-        if (Array.isArray(pageWords)) {
-        } else {
-            console.log('No pageWords array found in local storage');
+            // console.log('fileWords:', fileWords)
+
+            //// load pageWords from storage ////
+            let pageWords = [];
+            chrome.storage.local.get('pageWords', function(result) {
+                pageWords = result.pageWords;
+
+            console.log('c')
+            // console.log('pageWords:', pageWords)
+
+            
+            if (Array.isArray(pageWords)) {
+            } else {
+                console.log('No pageWords array found in local storage');
+            }
+            
+            console.log('d')
+
+            // compute word comparison
+            let elements = computeWordComparison(pageWords, fileWords)
+
+            console.log('e')
+            // console.log('elements:', elements)
+
+            // update words_to_underline with the new words
+            red_words_to_underline.splice(0, red_words_to_underline.length, ...elements['uniqueElements']);
+            green_words_to_underline.splice(0, red_words_to_underline.length, ...elements['commonElements']);
+
+            console.log('f')
+
+            // update regex with the new words
+            redRegex = createRegexFromArray(red_words_to_underline);
+
+            console.log('g')
+
+            greenRegex = createRegexFromArray(green_words_to_underline);
+
+            console.log('h')
+            console.log('red_words_to_underline:', red_words_to_underline)
+            console.log('green_words_to_underline:', green_words_to_underline)
+            console.log('redRegex:', redRegex)
+            console.log('greenRegex:', greenRegex)
+
+            sendResponse({message: 'Underline words updated.'});
+        });
+
         }
-          
-        // compute word comparison
-        let elements = computeWordComparison(pageWords, fileWords)
-
-        // update words_to_underline with the new words
-        red_words_to_underline.splice(0, red_words_to_underline.length, ...elements['uniqueElements']);
-        green_words_to_underline.splice(0, red_words_to_underline.length, ...elements['commonElements']);
-
-        // update regex with the new words
-        redRegex = createRegexFromArray(red_words_to_underline);
-        greenRegex = createRegexFromArray(green_words_to_underline);
-        sendResponse({message: 'Underline words updated.'});
-    });
-
     }
-}
+// );

@@ -15,3 +15,15 @@ Integrating seamlessly with Google Docs, JobSeekr analyzes job descriptions and 
 - Convenience: JobSeekr provides a user-friendly interface and tools that make the process of creating customized resumes and cover letters convenient and hassle-free.
 
 Don't let your job applications go unnoticed. Elevate your chances of success with JobSeekr, the Chrome extension that empowers you to create compelling, keyword-optimized resumes and cover letters. Save time, gain valuable insights, and improve your employability with JobSeekr.
+
+## Content script table of contents
+
+A summary of the current set of content scripts - organized by directory:
+
+**Keyword Analyzer:** Provides tools for cleaning and organizing keywords, facilitating their use in job pages and resumes.
+
+**Highlighter:** Offers scripts and utilities for visually distinguishing keywords. It underlines keywords in red when they are present in the job post but not in the target resume, and in green when they are present in both.
+
+**Job Extractor:** Includes functions and utilities for accurately extracting essential job description details from LinkedIn job posts opened in browser tabs.
+
+**Popup:** Manages utilities and state control for the popup.html file, ensuring smooth functionality and user interaction.

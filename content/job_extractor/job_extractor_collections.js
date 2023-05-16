@@ -2,6 +2,8 @@
 // extract job data from collections version of LinkedIn job post
 if (window.location.href.includes("linkedin.com/jobs/collections/")) {
   window.onload = function() {
+    setTimeout(function() {
+
     var jobDetailsElement = document.getElementById("job-details");
     if (jobDetailsElement) {
       var element = jobDetailsElement.querySelector("span");
@@ -31,6 +33,7 @@ if (window.location.href.includes("linkedin.com/jobs/collections/")) {
             });
       }
     }
-  }
+  }, 2000); 
+}
 }
 
