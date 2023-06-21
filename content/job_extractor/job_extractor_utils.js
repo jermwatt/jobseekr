@@ -226,8 +226,6 @@ function splitStringByPattern(str) {
   return dictionary
 }
 
-
-
 function storePageWords(pageWords) {
   // set the fileWords in local storage
   chrome.storage.local.set({ pageWords }, () => {

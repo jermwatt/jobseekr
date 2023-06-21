@@ -2,16 +2,30 @@
 <html>
   <head>
     <title>Popup</title>
-  </head>
-  <body>
-    <button id="toggle-btn">Toggle Underline</button>
-    <input type="file" id="fileInput">
-    <button id="sendWords">Show words</button>
+
+    <script src="popup/popup_state.js"></script>
     <script src="popup/mammoth.browser.js"></script>
+    <script src="popup/pdf.js/pdf.js"></script>
     <script src="popup/popup_utils.js"></script>
     <script src="popup/button.js"></script>
     <script src="popup/fileContent.js"></script>
-    <script src="popup/upload.js"></script>
+    <script src="popup/upload/upload.js"></script>
+    <script src="popup/upload/process_file.js"></script>
+    <script src="popup/upload/upload_button.js"></script>
+    <script src="popup/upload/upload.js"></script>
     <script src="popup/popup.js"></script>
+    
+  </head>
+  <body>
+
+    <div id="popup-body">
+      <button id="toggleUnderlineButton">Toggle Underline</button>
+      <input type="file" id="fileUploadButton">
+      <button id="sendWords">Show words</button>
+    </div>
+
+
+
+
   </body>
 </html>

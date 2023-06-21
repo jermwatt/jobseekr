@@ -22,6 +22,7 @@ if (window.location.href.includes("linkedin.com/jobs/collections/")) {
 
             // pool keywords
             let pageWords = combineValueArrays(dictionary);
+            console.log('these are the pageWords: ', pageWords)
 
             // save pageWords to local storage
             chrome.storage.local.set({ pageWords }, () => {
